@@ -9,11 +9,11 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { Socket } from 'socket.io';
+import { ChatMessage } from 'src/types';
 // import { ChatGroup } from 'src/entities/chatGroup.entity';
-// import { ChatMessage } from 'src/entities/chatMessage.entity';
 
 type socketMessage = {
-  chatMessage: any;
+  chatMessage: ChatMessage;
   type: 'send' | 'edit' | 'delete';
 };
 @WebSocketGateway()
