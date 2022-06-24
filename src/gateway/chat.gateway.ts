@@ -39,6 +39,7 @@ export class ChatGateway
   }
   @SubscribeMessage('message')
   public async handleMessage(_: Socket, payload: socketMessage) {
+    console.log('payload =================================', payload);
     payload.chatMessage.isSender = false;
     this.server
       .to(payload.chatMessage.chatGroup?.id.toString())
