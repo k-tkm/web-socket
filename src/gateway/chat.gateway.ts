@@ -9,8 +9,13 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { Socket } from 'socket.io';
-// import { ChatMessage } from '../../src/entities/chatMessage.entity';
+import { ChatGroup } from 'src/entities/chatGroup.entity';
+// import { ChatMessage } from 'src/entities/chatMessage.entity';
 
+type socketMessage = {
+  chatMessage: any;
+  type: 'send' | 'edit' | 'delete';
+};
 @WebSocketGateway()
 export class ChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -32,16 +37,12 @@ export class ChatGateway
     // this.logger.log(`Client connected: ${client.id}`);
     this.server.emit('msgToClient', 'connected');
   }
-
   @SubscribeMessage('message')
-  public async handleMessage(_: Socket, payload: any) {
-    // this.server.to(payload.chatGroup?.id.toString()).emit('badgeClient', {
-    //   userId: payload.sender.id,
-    //   groupId: payload.chatGroup.id,
-    // });
+  public async handleMessage(_: Socket, payload: socketMessage) {
+    payload.chatMessage.isSender = false;
     this.server
-      .to(payload.chatGroup?.id.toString())
-      .emit('msgToClient', { ...payload, isSender: false });
+      .to(payload.chatMessage.chatGroup?.id.toString())
+      .emit('msgToClient', payload);
   }
 
   @SubscribeMessage('readReport')
