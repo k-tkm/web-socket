@@ -9,8 +9,8 @@ import {
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { Socket } from 'socket.io';
+import { ChatGroup } from 'src/types';
 import { ChatMessage } from 'src/types';
-// import { ChatGroup } from 'src/entities/chatGroup.entity';
 
 type socketMessage = {
   chatMessage: ChatMessage;
@@ -39,7 +39,6 @@ export class ChatGateway
   }
   @SubscribeMessage('message')
   public async handleMessage(_: Socket, payload: socketMessage) {
-    console.log('payload =================================', payload);
     payload.chatMessage.isSender = false;
     this.server
       .to(payload.chatMessage.chatGroup?.id.toString())
@@ -67,12 +66,14 @@ export class ChatGateway
   public joinRoom(client: Socket, room: string): void {
     //@TODO dbにグループがなかったらエラーを吐く
     client.join(room);
-    client.emit('joinedRoom', room);
+    // client.emit('joinedRoom', room);
   }
 
   @SubscribeMessage('leaveRoom')
   public leaveRoom(client: Socket, room: string): void {
-    client.leave(room);
-    client.emit('leftRoom', room);
+    if (client.rooms.has(room)) {
+      client.leave(room);
+    }
+    // client.emit('leftRoom', room);
   }
 }
